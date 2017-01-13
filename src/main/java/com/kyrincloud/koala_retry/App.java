@@ -1,5 +1,7 @@
 package com.kyrincloud.koala_retry;
 
+import com.kyrincloud.koala_retry.annotation.AutoInject;
+
 /**
  * Hello world!
  *

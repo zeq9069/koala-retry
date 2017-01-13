@@ -1,16 +1,14 @@
 package com.kyrincloud.koala_retry;
 
-import java.util.Set;
-
-import com.kyrincloud.koala_retry.utils.ClassUtil;
+import com.kyrincloud.koala_retry.annotation.RetryConfiguration;
+import com.kyrincloud.koala_retry.service.HelloService;
 
 public class AppTest{
 	
 	public static void main(String[] args) {
-		Set<Class<?>> clazzs = ClassUtil.getClassSet("com.kyrincloud.koala_retry");
-		for(Class c : clazzs){
-			System.out.println(c);
-		}
+		RetryConfiguration config = new RetryConfiguration("com.kyrincloud.koala_retry");
+		HelloService service = (HelloService) config.getBean(HelloService.class);
+		service.greet();
 	}
 	
 }
