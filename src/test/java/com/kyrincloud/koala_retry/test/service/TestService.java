@@ -1,4 +1,4 @@
-package com.kyrincloud.koala_retry.service;
+package com.kyrincloud.koala_retry.test.service;
 
 import com.kyrincloud.koala_retry.annotation.Service;
 

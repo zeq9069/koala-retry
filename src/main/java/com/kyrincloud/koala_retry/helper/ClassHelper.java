@@ -1,9 +1,11 @@
 package com.kyrincloud.koala_retry.helper;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
+import com.kyrincloud.koala_retry.annotation.Retry;
 import com.kyrincloud.koala_retry.annotation.Service;
 import com.kyrincloud.koala_retry.utils.ClassUtil;
 
@@ -57,5 +59,20 @@ public class ClassHelper {
 		}
 		return classSet;
 	}
-
+	
+	public static Set<Method> getMethodSetByAnnotation(Class<? extends Annotation> annotationClass){
+		Set<Method> results = Sets.newHashSet();
+		for (Class<?> clazz : CLAZZS) {
+			Method[] methods = clazz.getMethods();
+			
+			for(Method m : methods){
+				//if(m.isAccessible()){
+					if(m.getAnnotation(annotationClass) != null){
+						results.add(m);
+					}
+				//}
+			}
+		}
+		return results;
+	}
 }

@@ -10,12 +10,14 @@ public class BeanHelper {
 	
 	private static final Map<Class<?>,Object> BEANS = Maps.newHashMap();
 	
+	private ClassHelper helper;
+	
 	public BeanHelper(String basePack) {
+		 this.helper = new ClassHelper(basePack);
 		init(basePack);
 	}
 	
 	private void init(String basePack){
-		ClassHelper helper = new ClassHelper(basePack);
 		Set<Class<?>> beans = helper.getBeans();
 		for(Class<?> clazz : beans){
 			BEANS.put(clazz, ReflectionUtil.newInstance(clazz));
@@ -28,6 +30,10 @@ public class BeanHelper {
 	
 	public Map<Class<?>,Object> getBeanMap(){
 		return BEANS;
+	}
+	
+	public ClassHelper getClassHelper(){
+		return helper;
 	}
 
 }

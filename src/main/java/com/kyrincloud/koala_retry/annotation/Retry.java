@@ -15,4 +15,6 @@ public @interface Retry {
 	
 	int maxAttempt() default 0;
 	
+	long interval() default 1000l;
+	
 }
