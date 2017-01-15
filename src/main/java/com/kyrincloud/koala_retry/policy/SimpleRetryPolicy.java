@@ -1,5 +1,8 @@
 package com.kyrincloud.koala_retry.policy;
 
+import com.kyrincloud.koala_retry.support.AbstractRetryContext;
+import com.kyrincloud.koala_retry.support.RetryContext;
+
 public class SimpleRetryPolicy implements RetryPolicy{
 	
 	private Sleep sleep;
@@ -10,56 +13,45 @@ public class SimpleRetryPolicy implements RetryPolicy{
 
 	private Class<? extends Throwable>[] execludeExceptions;
 
+	public boolean canRetry(RetryContext context) {
+		SimlpeRetryContext contxt = (SimlpeRetryContext)context;
+		return canRetry(context.getRetryCount(),contxt.getLastThrowable());
+	}
 
-	public boolean canRetry(int retryCount , Throwable lastExeception) {
-		if(retryCount < maxAttempt-1){
-			
-			if(lastExeception == null){
-				return includeExceptions == null || includeExceptions.length == 0;
-			}
-			
-			if(execludeExceptions != null){
-				for(Class<? extends Throwable> clazz : execludeExceptions){
-					if(clazz.isAssignableFrom(lastExeception.getClass())){
-						return false;
-					}
-				}
-			}
-			if(includeExceptions != null){
-				for(Class<? extends Throwable> clazz : includeExceptions){
-					if(clazz.isAssignableFrom(lastExeception.getClass())){
-						return true;
-					}
-				}
-			}else{
-				return true;
-			}
-		}
-		return false;
+	public void registThrowable(Throwable throwable) {
+		registThrowable(throwable);
 	}
 	
-	public boolean isLast(int retryCount,Throwable lastExeception){
-		if(maxAttempt-1 == retryCount){
-			if(execludeExceptions != null && execludeExceptions.length > 0){
-				for(Class<? extends Throwable> clazz : execludeExceptions){
-					if(clazz.isAssignableFrom(lastExeception.getClass())){
-						return false;
-					}
+	private boolean canRetry(int retryCount , Throwable lastExeception) {
+		return (lastExeception == null || includeExeception(lastExeception)) && retryCount < maxAttempt;
+	}
+	
+	private boolean includeExeception(Throwable lastExeception){
+		if(includeExceptions.length == 0 && execludeExceptions.length == 0){
+			return true;
+		}
+		
+		if(execludeExceptions.length > 0){
+			for(Class<?> clazz : execludeExceptions){
+				if(clazz.isAssignableFrom(lastExeception.getClass())){
+					return false;
 				}
 			}
-			if(includeExceptions == null || includeExceptions.length == 0){
-				return true;
-			}
-			for(Class<? extends Throwable> clazz : includeExceptions){
+		}
+		
+		if(includeExceptions.length == 0){ 
+			return true;
+		}else{
+			for(Class<?> clazz : includeExceptions){
 				if(clazz.isAssignableFrom(lastExeception.getClass())){
 					return true;
 				}
 			}
+			return false;
 		}
-		return false;
 		
 	}
-
+	
 	public int getMaxAttempt() {
 		return maxAttempt;
 	}
@@ -91,4 +83,15 @@ public class SimpleRetryPolicy implements RetryPolicy{
 	public void setExecludeExceptions(Class<? extends Throwable>[] execludeExceptions) {
 		this.execludeExceptions = execludeExceptions;
 	}
+	
+	public RetryContext buildContext(){
+		return (RetryContext) new SimlpeRetryContext();
+	}
+	
+	class SimlpeRetryContext extends AbstractRetryContext{
+		public SimlpeRetryContext() {
+			super();
+		}
+	}
+
 }

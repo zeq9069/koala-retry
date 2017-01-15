@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 import com.kyrincloud.koala_retry.annotation.Retry;
 import com.kyrincloud.koala_retry.annotation.Service;
-import com.kyrincloud.koala_retry.support.RetryContext;
+import com.kyrincloud.koala_retry.policy.RetryPolicyCache;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
@@ -16,7 +16,7 @@ public class RetryMethodInvocationBuilder {
 	public static  <T> T buildRetryInterceptor(final Class<?> target){
 		return (T) Enhancer.create(target, new MethodInterceptor(){
 			public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-				RetryContext context = new RetryContext();
+				RetryPolicyCache context = new RetryPolicyCache();
 				if(target.getAnnotation(Service.class) != null){
 					if(method.getAnnotation(Retry.class) != null){
 						return new RetryInterceptor(obj, method, args, proxy , context).invoke();

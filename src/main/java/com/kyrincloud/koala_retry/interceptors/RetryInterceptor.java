@@ -2,6 +2,7 @@ package com.kyrincloud.koala_retry.interceptors;
 
 import java.lang.reflect.Method;
 
+import com.kyrincloud.koala_retry.policy.RetryPolicyCache;
 import com.kyrincloud.koala_retry.policy.SimpleRetryPolicy;
 import com.kyrincloud.koala_retry.support.RetryContext;
 
@@ -17,41 +18,33 @@ public class RetryInterceptor {
 	
 	private MethodProxy proxy;
 	
-	private RetryContext context;
+	private RetryPolicyCache cache;
 	
 	
-	public RetryInterceptor(Object obj, Method method, Object[] args, MethodProxy proxy,RetryContext context) {
+	public RetryInterceptor(Object obj, Method method, Object[] args, MethodProxy proxy,RetryPolicyCache cache) {
 		this.obj = obj;
 		this.method = method;
 		this.args = args;
 		this.proxy = proxy;
-		this.context = context;
+		this.cache = cache;
 	}
 	
 	public Object invoke() throws Throwable {
 		Object result = null;
-		int count = 0;
-		SimpleRetryPolicy policy = context.getPolicy(method); 
-		Throwable lastExeception = null;
-		try{
-			count++;
-			result = proxy.invokeSuper(obj, args);
-		}catch(Throwable e){
-			lastExeception = e;
-		}
-		while(policy.canRetry(count,lastExeception) && !policy.isLast(count,lastExeception)){
+		SimpleRetryPolicy policy = cache.getPolicy(method);
+		RetryContext context =policy.buildContext(); 
+		Throwable lastException = null;
+		while(policy.canRetry(context)){
 			try{
-				policy.getSleep().sleep();
-				result = proxy.invokeSuper(obj, args);
+				lastException = null;
+				return proxy.invokeSuper(obj, args);
 			}catch(Throwable e){
-				lastExeception = e;
+				lastException = e;
+				context.registThrowable(lastException);
+				if(policy.canRetry(context)){
+					policy.getSleep().sleep();
+				}
 			}
-		}
-		if(policy.isLast(count,lastExeception)){
-			policy.getSleep().sleep();
-			result = proxy.invokeSuper(obj, args);
-		}else if(lastExeception != null){
-			throw lastExeception;
 		}
 		return result;
 	}
