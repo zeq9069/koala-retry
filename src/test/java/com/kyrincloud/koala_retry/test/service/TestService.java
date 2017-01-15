@@ -6,7 +6,7 @@ import com.kyrincloud.koala_retry.annotation.Service;
 @Service
 public class TestService {
 	
-	@Retry(maxAttempt = 2,interval = 5000l)
+	@Retry(maxAttempt = 2,interval = 1000l)
 	public void sayHello(){
 		System.out.println("Hello kyrin!");
 	}

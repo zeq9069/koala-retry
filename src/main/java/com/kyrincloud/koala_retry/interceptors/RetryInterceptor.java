@@ -30,7 +30,6 @@ public class RetryInterceptor {
 	}
 	
 	public Object invoke() throws Throwable {
-		Object result = null;
 		SimpleRetryPolicy policy = cache.getPolicy(method);
 		RetryContext context =policy.buildContext(); 
 		Throwable lastException = null;
@@ -46,7 +45,10 @@ public class RetryInterceptor {
 				}
 			}
 		}
-		return result;
+		if(lastException != null){
+			throw lastException;
+		}
+		return null;
 	}
 
 }
