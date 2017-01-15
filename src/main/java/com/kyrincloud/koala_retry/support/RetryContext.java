@@ -11,32 +11,27 @@ import com.kyrincloud.koala_retry.policy.SimpleRetryPolicy;
 
 public class RetryContext {
 
-	private ClassHelper classHelper;
+	private static Map<String, SimpleRetryPolicy> retryPolicyCache = new HashMap<String, SimpleRetryPolicy>();
 	
-	private Map<String, SimpleRetryPolicy> retryPolicyCache = new HashMap<String, SimpleRetryPolicy>();
-	
-	public RetryContext(ClassHelper classHelper) {
-		this.classHelper = classHelper;
-		init();
-	}
-	
-	@SuppressWarnings("static-access")
-	public void init(){
-		Set<Method> methods = classHelper.getMethodSetByAnnotation(Retry.class);
+	static{
+		Set<Method> methods = ClassHelper.getMethodSetByAnnotation(Retry.class);
 		for(Method m : methods){
 			Retry retry = m.getAnnotation(Retry.class);
 			SimpleRetryPolicy policy = new SimpleRetryPolicy();
-			policy.setExceptions(retry.value());
 			policy.setMaxAttempt(retry.maxAttempt());
 			policy.setRetryInterval(retry.interval());
+			policy.setIncludeExceptions(retry.include());
+			policy.setExecludeExceptions(retry.execlude());
 			retryPolicyCache.put(m.getName(), policy);
 		}
 	}
 	
-	public  void addRetryPolicy(Method method , Retry retry){
+	public void addRetryPolicy(Method method , Retry retry){
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
-		Class<? extends Throwable>[] values = retry.value();
-		policy.setExceptions(values);
+		Class<? extends Throwable>[] include = retry.include();
+		Class<? extends Throwable>[] execlude = retry.execlude();
+		policy.setIncludeExceptions(include);
+		policy.setExecludeExceptions(execlude);
 		if(retry.maxAttempt() > 1){
 			policy.setMaxAttempt(retry.maxAttempt());
 		}

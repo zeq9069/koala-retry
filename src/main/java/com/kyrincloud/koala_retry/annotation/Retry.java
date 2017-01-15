@@ -11,7 +11,9 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Retry {
 
-	Class<? extends Throwable>[] value() default {};
+	Class<? extends Throwable>[] include() default {};
+
+	Class<? extends Throwable>[] execlude() default {};
 	
 	int maxAttempt() default 0;
 	

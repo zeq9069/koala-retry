@@ -41,7 +41,7 @@ public class RetryInterceptor {
 					}catch(Throwable e){
 						lastExeception = e;
 					}
-					while(policy.canRetry(count,lastExeception) && !policy.isLast(count)){
+					while(policy.canRetry(count,lastExeception) && !policy.isLast(count,lastExeception)){
 							try{
 								policy.getSleep().sleep();
 								result = proxy.invokeSuper(obj, args);
@@ -49,7 +49,7 @@ public class RetryInterceptor {
 								lastExeception = e;
 							}
 						}
-					if(policy.isLast(count)){
+					if(policy.isLast(count,lastExeception)){
 						policy.getSleep().sleep();
 						result = proxy.invokeSuper(obj, args);
 					}else if(lastExeception != null){

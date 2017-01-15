@@ -6,37 +6,64 @@ public class SimpleRetryPolicy implements RetryPolicy{
 	
 	private int maxAttempt = 3;
 	
-	private Class<? extends Throwable>[] exceptions;
+	private Class<? extends Throwable>[] includeExceptions;
+
+	private Class<? extends Throwable>[] execludeExceptions;
+
 
 	public boolean canRetry(int retryCount , Throwable lastExeception) {
 		if(retryCount < maxAttempt-1){
-			if(exceptions == null){
+			
+			if(lastExeception == null){
+				return includeExceptions == null || includeExceptions.length == 0;
+			}
+			
+			if(execludeExceptions != null){
+				for(Class<? extends Throwable> clazz : execludeExceptions){
+					if(clazz.isAssignableFrom(lastExeception.getClass())){
+						return false;
+					}
+				}
+			}
+			if(includeExceptions != null){
+				for(Class<? extends Throwable> clazz : includeExceptions){
+					if(clazz.isAssignableFrom(lastExeception.getClass())){
+						return true;
+					}
+				}
+			}else{
 				return true;
 			}
-			if(lastExeception == null){
-				return false;
+		}
+		return false;
+	}
+	
+	public boolean isLast(int retryCount,Throwable lastExeception){
+		if(maxAttempt-1 == retryCount){
+			if(execludeExceptions != null && execludeExceptions.length > 0){
+				for(Class<? extends Throwable> clazz : execludeExceptions){
+					if(clazz.isAssignableFrom(lastExeception.getClass())){
+						return false;
+					}
+				}
 			}
-			for(Class<? extends Throwable> clazz : exceptions){
+			if(includeExceptions == null || includeExceptions.length == 0){
+				return true;
+			}
+			for(Class<? extends Throwable> clazz : includeExceptions){
 				if(clazz.isAssignableFrom(lastExeception.getClass())){
 					return true;
 				}
 			}
 		}
 		return false;
-	}
-	
-	public boolean isLast(int retryCount){
-		return maxAttempt-1 == retryCount;
+		
 	}
 
 	public int getMaxAttempt() {
 		return maxAttempt;
 	}
 
-	public Class<? extends Throwable>[] getExceptions() {
-		return exceptions;
-	}
-	
 	public Sleep getSleep(){
 		return sleep;
 	}
@@ -49,9 +76,19 @@ public class SimpleRetryPolicy implements RetryPolicy{
 		this.maxAttempt = maxAttempt;
 	}
 
-	public void setExceptions(Class<? extends Throwable>[] exceptions) {
-		this.exceptions = exceptions;
+	public Class<? extends Throwable>[] getIncludeExceptions() {
+		return includeExceptions;
 	}
-	
 
+	public void setIncludeExceptions(Class<? extends Throwable>[] includeExceptions) {
+		this.includeExceptions = includeExceptions;
+	}
+
+	public Class<? extends Throwable>[] getExecludeExceptions() {
+		return execludeExceptions;
+	}
+
+	public void setExecludeExceptions(Class<? extends Throwable>[] execludeExceptions) {
+		this.execludeExceptions = execludeExceptions;
+	}
 }

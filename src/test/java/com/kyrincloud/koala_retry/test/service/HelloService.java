@@ -10,8 +10,9 @@ public class HelloService {
 	@AutoInject
 	TestService test;
 	
-	@Retry(value = {Exception.class},maxAttempt = 2,interval = 5000l)
+	@Retry(execlude = {ArrayIndexOutOfBoundsException.class},maxAttempt = 2,interval = 5000l)
 	public void greet() throws Exception{
+		System.out.println("greet");
 			test.sayHello();
 			throw new Exception("业务性重试");
 	}

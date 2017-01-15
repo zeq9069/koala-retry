@@ -5,32 +5,25 @@ import java.lang.reflect.Method;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
-import com.kyrincloud.koala_retry.annotation.Retry;
 import com.kyrincloud.koala_retry.annotation.Service;
+import com.kyrincloud.koala_retry.config.ConfigHelper;
 import com.kyrincloud.koala_retry.utils.ClassUtil;
 
 public class ClassHelper {
 	
 	private static Set<Class<?>> CLAZZS;
 	
-	private String basePack;
-	
-	public ClassHelper(String basePack) {
-		this.basePack = basePack;
-		init();
+	static{
+		CLAZZS = ClassUtil.getClassSet(ConfigHelper.getBasePack());
 	}
 	
-	private void init(){
-		CLAZZS = ClassUtil.getClassSet(basePack);
-	}
-	
-	public Set<Class<?>> getBeans(){
+	public static Set<Class<?>> getBeans(){
 		Set<Class<?>> beans = Sets.newHashSet();
 		beans.addAll(getServices());
 		return beans;
 	}
 	
-	public Set<Class<?>> getServices(){
+	public static Set<Class<?>> getServices(){
 		Set<Class<?>> services = Sets.newHashSet();
 		for(Class<?> clazz : CLAZZS){
 			if(clazz.isAnnotationPresent(Service.class)){
