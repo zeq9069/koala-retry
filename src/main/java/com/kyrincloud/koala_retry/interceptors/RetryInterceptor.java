@@ -18,15 +18,14 @@ public class RetryInterceptor {
 	
 	private MethodProxy proxy;
 	
-	private RetryPolicyCache cache;
+	private RetryPolicyCache cache = new RetryPolicyCache();
 	
 	
-	public RetryInterceptor(Object obj, Method method, Object[] args, MethodProxy proxy,RetryPolicyCache cache) {
+	public RetryInterceptor(Object obj, Method method, Object[] args, MethodProxy proxy) {
 		this.obj = obj;
 		this.method = method;
 		this.args = args;
 		this.proxy = proxy;
-		this.cache = cache;
 	}
 	
 	public Object invoke() throws Throwable {
