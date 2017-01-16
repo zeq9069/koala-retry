@@ -21,6 +21,7 @@ public class RetryPolicyCache {
 			policy.setRetryInterval(retry.interval());
 			policy.setIncludeExceptions(retry.include());
 			policy.setExecludeExceptions(retry.execlude());
+			policy.setThisOneRetry(retry.thisOneRetry());
 			retryPolicyCache.put(m.getName(), policy);
 		}
 	}
@@ -31,6 +32,7 @@ public class RetryPolicyCache {
 		Class<? extends Throwable>[] execlude = retry.execlude();
 		policy.setIncludeExceptions(include);
 		policy.setExecludeExceptions(execlude);
+		policy.setThisOneRetry(retry.thisOneRetry());
 		if(retry.maxAttempt() > 1){
 			policy.setMaxAttempt(retry.maxAttempt());
 		}

@@ -19,4 +19,10 @@ public @interface Retry {
 	
 	long interval() default 1000l;
 	
+	/**
+	 * 选择性重试，此次是否重试，默认执行重试策略
+	 * args[] index
+	 */
+	int thisOneRetry() default -1;
+	
 }

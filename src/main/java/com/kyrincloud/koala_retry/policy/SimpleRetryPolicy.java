@@ -9,6 +9,8 @@ public class SimpleRetryPolicy implements RetryPolicy{
 	
 	private int maxAttempt = 3;
 	
+	private int thisOneRetry = -1;
+	
 	private Class<? extends Throwable>[] includeExceptions;
 
 	private Class<? extends Throwable>[] execludeExceptions;
@@ -84,6 +86,14 @@ public class SimpleRetryPolicy implements RetryPolicy{
 		this.execludeExceptions = execludeExceptions;
 	}
 	
+	public int getThisOneRetry() {
+		return thisOneRetry;
+	}
+
+	public void setThisOneRetry(int thisOneRetry) {
+		this.thisOneRetry = thisOneRetry;
+	}
+
 	public RetryContext buildContext(){
 		return (RetryContext) new SimlpeRetryContext();
 	}

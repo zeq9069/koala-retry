@@ -39,6 +39,15 @@ public class RetryInterceptor {
 			}catch(Throwable e){
 				lastException = e;
 				context.registThrowable(lastException);
+				if(policy.getThisOneRetry() != -1){
+					Object obj = args[policy.getThisOneRetry()];
+					if(obj instanceof Boolean){
+						Boolean retry = (Boolean) obj;
+						if(!retry){
+							break; 
+						}
+					}
+				}
 				if(policy.canRetry(context)){
 					policy.getSleep().sleep();
 				}

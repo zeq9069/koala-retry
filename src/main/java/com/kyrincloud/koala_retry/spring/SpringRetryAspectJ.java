@@ -1,6 +1,7 @@
 package com.kyrincloud.koala_retry.spring;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -30,7 +31,7 @@ public class SpringRetryAspectJ implements BeanFactoryAware{
 	public Object around(ProceedingJoinPoint pj) throws Throwable{
 		MethodSignature sig=(MethodSignature) pj.getSignature();
 		Method method=sig.getMethod();
-		
+		Object [] args = pj.getArgs();
 		SimpleRetryPolicy policy = getPolicy(method);
 		RetryContext context =policy.buildContext(); 
 		Throwable lastException = null;
@@ -41,6 +42,15 @@ public class SpringRetryAspectJ implements BeanFactoryAware{
 			}catch(Throwable e){
 				lastException = e;
 				context.registThrowable(lastException);
+				if(policy.getThisOneRetry() != -1){
+					Object obj = args[policy.getThisOneRetry()];
+					if(obj instanceof Boolean){
+						Boolean retry = (Boolean) obj;
+						if(!retry){
+							break; 
+						}
+					}
+				}
 				if(policy.canRetry(context)){
 					policy.getSleep().sleep();
 				}
